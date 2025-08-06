@@ -1,6 +1,10 @@
 package enet
 
 // #include <enet/enet.h>
+//
+// void enet_host_checksum_crc32(ENetHost* host) {
+//     host->checksum = enet_crc32;
+// }
 import "C"
 import (
 	"errors"
@@ -14,6 +18,7 @@ type Host interface {
 	Connect(addr Address, channelCount int, data uint32) (Peer, error)
 
 	CompressWithRangeCoder() error
+	SetChecksumCRC32()
 	BroadcastBytes(data []byte, channel uint8, flags PacketFlags) error
 	BroadcastPacket(packet Packet, channel uint8) error
 	BroadcastString(str string, channel uint8, flags PacketFlags) error
@@ -64,6 +69,10 @@ func (host *enetHost) CompressWithRangeCoder() error {
 	}
 
 	return nil
+}
+
+func (host *enetHost) SetChecksumCRC32() {
+	C.enet_host_checksum_crc32(host.cHost)
 }
 
 // NewHost creats a host for communicating to peers
